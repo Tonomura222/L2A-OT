@@ -66,8 +66,6 @@ def get_args():
     train_arg_parser.add_argument("--train", type=bool, default=True,
                                   help='')
     args = train_arg_parser.parse_args()
-
-
     return args
 
 class L2A_OT_Trainer(object):
@@ -146,19 +144,21 @@ class L2A_OT_Trainer(object):
         self.best_accuracy_val = 0
 
     def D_init(self):
-        self.D = resnet18(pretrained=False, num_classes=self.num_domains)
+        self.D = resnet18(pretrained=True)
+        self.D.fc = nn.Linear(self.D.fc.in_features, self.num_domains)
         #weight = torch.load("/home/dailh/.cache/torch/checkpoints/resnet18-5c106cde.pth")
         #weight['fc.weight'] = self.D.state_dict()['fc.weight']
         #weight['fc.bias'] = self.D.state_dict()['fc.bias']
         #self.D.load_state_dict(weight)
-        # self.D = DomianClassifier(domain=3)
+        ## self.D = DomianClassifier(domain=3)
         self.D.to(self.device)
         self.d_optimizer = torch.optim.Adam(self.D.parameters(), self.lr, (self.beta1, self.beta2))
 
         return
 
     def C_init(self):
-        self.C = resnet18(pretrained=False, num_classes=self.n_classes)
+        self.C = resnet18(pretrained=True)
+        self.C.fc = nn.Linear(self.C.fc.in_features, self.n_classes)
         #weight = torch.load("/home/dailh/.cache/torch/checkpoints/resnet18-5c106cde.pth")
         #weight['fc.weight'] = self.C.state_dict()['fc.weight']
         #weight['fc.bias'] = self.C.state_dict()['fc.bias']
@@ -169,11 +169,12 @@ class L2A_OT_Trainer(object):
         return
 
     def DGC_init(self):
-        self.DGC = resnet18(pretrained=False, num_classes=self.n_classes)
-        weight = torch.load("/home/dailh/.cache/torch/checkpoints/resnet18-5c106cde.pth")
-        weight['fc.weight'] = self.DGC.state_dict()['fc.weight']
-        weight['fc.bias'] = self.DGC.state_dict()['fc.bias']
-        self.DGC.load_state_dict(weight)
+        self.DGC = resnet18(pretrained=True)
+        self.DGC.fc = nn.Linear(self.DGC.fc.in_features, self.n_classes)
+        #weight = torch.load("/home/dailh/.cache/torch/checkpoints/resnet18-5c106cde.pth")
+        #weight['fc.weight'] = self.DGC.state_dict()['fc.weight']
+        #weight['fc.bias'] = self.DGC.state_dict()['fc.bias']
+        #self.DGC.load_state_dict(weight)
         self.DGC.to(self.device)
         # self.DGC.cuda(1)
         self.dgc_optimizer = torch.optim.Adam(self.DGC.parameters(), self.lr, (self.beta1, self.beta2))
