@@ -15,7 +15,6 @@ from utils.utils import *
 from utils.wassersteinLoss import *
 from torchvision.utils import save_image
 
-
 os.environ['CUDA_VISIBLE_DEVICES'] = "3,0"
 
 mnist = 'mnist'
@@ -60,7 +59,7 @@ def get_args():
                                   help='')
     train_arg_parser.add_argument("--state_dict", type=str, default='',
                                   help='')
-    train_arg_parser.add_argument("--data_root", type=str, default="/home/dailh/L2A-OT/data/Train val splits and h5py files pre-read",
+    train_arg_parser.add_argument("--data_root", type=str, default="data/Train val splits and h5py files pre-read",
                                   help='')
     train_arg_parser.add_argument("--deterministic", type=bool, default=False,
                                   help='')
@@ -148,10 +147,10 @@ class L2A_OT_Trainer(object):
 
     def D_init(self):
         self.D = resnet18(pretrained=False, num_classes=self.num_domains)
-        weight = torch.load("/home/dailh/.cache/torch/checkpoints/resnet18-5c106cde.pth")
-        weight['fc.weight'] = self.D.state_dict()['fc.weight']
-        weight['fc.bias'] = self.D.state_dict()['fc.bias']
-        self.D.load_state_dict(weight)
+        #weight = torch.load("/home/dailh/.cache/torch/checkpoints/resnet18-5c106cde.pth")
+        #weight['fc.weight'] = self.D.state_dict()['fc.weight']
+        #weight['fc.bias'] = self.D.state_dict()['fc.bias']
+        #self.D.load_state_dict(weight)
         # self.D = DomianClassifier(domain=3)
         self.D.to(self.device)
         self.d_optimizer = torch.optim.Adam(self.D.parameters(), self.lr, (self.beta1, self.beta2))
@@ -160,10 +159,10 @@ class L2A_OT_Trainer(object):
 
     def C_init(self):
         self.C = resnet18(pretrained=False, num_classes=self.n_classes)
-        weight = torch.load("/home/dailh/.cache/torch/checkpoints/resnet18-5c106cde.pth")
-        weight['fc.weight'] = self.C.state_dict()['fc.weight']
-        weight['fc.bias'] = self.C.state_dict()['fc.bias']
-        self.C.load_state_dict(weight)
+        #weight = torch.load("/home/dailh/.cache/torch/checkpoints/resnet18-5c106cde.pth")
+        #weight['fc.weight'] = self.C.state_dict()['fc.weight']
+        #weight['fc.bias'] = self.C.state_dict()['fc.bias']
+        #self.C.load_state_dict(weight)
         self.C.to(self.device)
         self.c_optimizer = torch.optim.Adam(self.C.parameters(), self.lr, (self.beta1, self.beta2))
 
@@ -601,6 +600,7 @@ class L2A_OT_Trainer(object):
 def main():
     args = get_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"using {device} device")
     trainer = L2A_OT_Trainer(args, device)
     if args.train == True:
         trainer.C_init()
